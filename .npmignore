@@ -1,0 +1,10 @@
+karma.conf.js
+webpack*
+test
+docs*
+jsdoc*
+.eslintrc.json
+.prettierrc
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+
