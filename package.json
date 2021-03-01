@@ -46,11 +46,20 @@
     "prettier": "^1.19.1",
     "regenerator-runtime": "^0.13.5",
     "three": "^0.115.0",
-    "webpack": "^4.41.6",
-    "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
+    "workbox-webpack-plugin": "^5.1.4",
     "webpack-merge": "^4.2.2"
   },
   "optionalDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "@aws-amplify/analytics": "^4.0.12",
+    "@aws-amplify/interactions": "^3.3.24",
+    "@aws-amplify/storage": "^3.3.24",
+    "@aws-amplify/ui": "^2.0.2",
+    "@aws-amplify/xr": "^2.2.24",
+    "aws-amplify": "^3.3.21",
+    "terser-webpack-plugin": "^4.2.3"
+  }
 }

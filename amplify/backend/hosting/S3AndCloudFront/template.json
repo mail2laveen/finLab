@@ -7,16 +7,14 @@
         },
         "bucketName": {
             "Type": "String"
+        },
+        "lambdaEdgeProtectionStackName": {
+            "Type": "String"
         }
     },
     "Conditions": {
         "ShouldNotCreateEnvResources": {
-            "Fn::Equals": [
-                {
-                    "Ref": "env"
-                },
-                "NONE"
-            ]
+            "Fn::Equals": [ { "Ref": "env" }, "NONE" ]
         }
     },
     "Resources": {
@@ -31,22 +29,15 @@
                             "Ref": "bucketName"
                         },
                         {
-                            "Fn::Join": [
-                                "",
-                                [
-                                    {
-                                        "Ref": "bucketName"
-                                    },
-                                    "-",
-                                    {
-                                        "Ref": "env"
-                                    }
+                            "Fn::Join": [ "", [ 
+                                { "Ref": "bucketName" }, 
+                                "-", 
+                                { "Ref": "env" }
                                 ]
                             ]
                         }
                     ]
                 },
-                "AccessControl": "Private",
                 "WebsiteConfiguration": {
                     "IndexDocument": "index.html",
                     "ErrorDocument": "index.html"
@@ -65,6 +56,178 @@
                                 "*"
                             ],
                             "MaxAge": 3000
+                        }
+                    ]
+                }
+            }
+        },
+        "PrivateBucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
+            "DependsOn": "OriginAccessIdentity",
+            "Properties": {
+                "PolicyDocument": {
+                    "Id": "MyPolicy",
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "APIReadForGetBucketObjects",
+                            "Effect": "Allow",
+                            "Principal": {
+                                "CanonicalUser": {
+                                    "Fn::GetAtt": [
+                                        "OriginAccessIdentity",
+                                        "S3CanonicalUserId"
+                                    ]
+                                }
+                            },
+                            "Action": "s3:GetObject",
+                            "Resource": {
+                                "Fn::Join": [ "", [ "arn:aws:s3:::", { "Ref": "S3Bucket" }, "/*" ] ]
+                            }
+                        }
+                    ]
+                },
+                "Bucket": {
+                    "Ref": "S3Bucket"
+                }
+            }
+        },
+        "OriginAccessIdentity": {
+            "Type": "AWS::CloudFront::CloudFrontOriginAccessIdentity",
+            "Properties": {
+                "CloudFrontOriginAccessIdentityConfig": {
+                    "Comment": "CloudFrontOriginAccessIdentityConfig"
+                }
+            }
+        },
+        "CloudFrontDistribution": {
+            "Type": "AWS::CloudFront::Distribution",
+            "DependsOn": [
+                "S3Bucket",
+                "OriginAccessIdentity"
+            ],
+            "Properties": {
+                "DistributionConfig": {
+                    "CacheBehaviors": [
+                        {
+                            "PathPattern": "/parseauth",
+                            "Compress": true,
+                            "ForwardedValues": {
+                                "QueryString": true
+                            },
+                            "LambdaFunctionAssociations": [
+                                {
+                                    "EventType": "viewer-request",
+                                    "LambdaFunctionARN": { "Fn::ImportValue" : { 
+                                        "Fn::Sub": "${lambdaEdgeProtectionStackName}-ParseAuthHandler" } } 
+                                }
+                            ],
+                            "TargetOriginId": "dummy-origin",
+                            "ViewerProtocolPolicy": "redirect-to-https"
+                        },
+                        {
+                            "PathPattern": "/refreshauth",
+                            "Compress": true,
+                            "ForwardedValues": {
+                                "QueryString": true
+                            },
+                            "LambdaFunctionAssociations": [
+                                {
+                                    "EventType": "viewer-request",
+                                    "LambdaFunctionARN": { "Fn::ImportValue" : { "Fn::Sub": "${lambdaEdgeProtectionStackName}-RefreshAuthHandler" } } 
+                                }
+                            ],
+                            "TargetOriginId": "dummy-origin",
+                            "ViewerProtocolPolicy": "redirect-to-https"
+                        },
+                        {
+                            "PathPattern": "/signout",
+                            "Compress": true,
+                            "ForwardedValues": {
+                                "QueryString": true
+                            },
+                            "LambdaFunctionAssociations": [
+                                {
+                                    "EventType": "viewer-request",
+                                    "LambdaFunctionARN": { "Fn::ImportValue" : { "Fn::Sub": "${lambdaEdgeProtectionStackName}-SignOutHandler" } }
+                                }
+                            ],
+                            "TargetOriginId": "dummy-origin",
+                            "ViewerProtocolPolicy": "redirect-to-https"
+                        }
+                    ],
+                    "Origins": [
+                        {
+                            "DomainName": "example.org",
+                            "Id": "dummy-origin",
+                            "CustomOriginConfig": {
+                                "OriginProtocolPolicy": "match-viewer"
+                            }
+                        },
+                        {
+                            "DomainName": {
+                                "Fn::GetAtt": [
+                                    "S3Bucket",
+                                    "DomainName"
+                                ]
+                            },
+                            "Id": "hostingS3Bucket",
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "origin-access-identity/cloudfront/",
+                                            {
+                                                "Ref": "OriginAccessIdentity"
+                                            }
+                                        ]
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "Enabled": "true",
+                    "DefaultCacheBehavior": {
+                        "LambdaFunctionAssociations": [
+                            {
+                                "EventType": "viewer-request",
+                                "LambdaFunctionARN": { "Fn::ImportValue" : { "Fn::Sub": "${lambdaEdgeProtectionStackName}-CheckAuthHandler" } } 
+                            },
+                            {
+                                "EventType": "origin-response",
+                                "LambdaFunctionARN": { "Fn::ImportValue" : { "Fn::Sub": "${lambdaEdgeProtectionStackName}-HttpHeadersHandler" } } 
+                            }
+                        ],  
+                        "TargetOriginId": "hostingS3Bucket",
+                        "ForwardedValues": {
+                            "QueryString": "true"
+                        },
+                        "ViewerProtocolPolicy": "redirect-to-https",
+                        "DefaultTTL": 0,
+                        "MaxTTL": 0,
+                        "MinTTL": 0,
+                        "Compress": true
+                    },
+                    "DefaultRootObject": "index.html",
+                    "CustomErrorResponses": [
+                        {
+                            "ErrorCachingMinTTL": 300,
+                            "ErrorCode": 400,
+                            "ResponseCode": 200,
+                            "ResponsePagePath": "/"
+                        },
+                        {
+                            "ErrorCachingMinTTL": 300,
+                            "ErrorCode": 403,
+                            "ResponseCode": 200,
+                            "ResponsePagePath": "/"
+                        },
+                        {
+                            "ErrorCachingMinTTL": 300,
+                            "ErrorCode": 404,
+                            "ResponseCode": 200,
+                            "ResponsePagePath": "/"
                         }
                     ]
                 }
@@ -108,6 +271,40 @@
                 ]
             },
             "Description": "Name of S3 bucket to hold website content"
+        },
+        "CloudFrontDistributionID": {
+            "Value": {
+                "Ref": "CloudFrontDistribution"
+            }
+        },
+        "CloudFrontDomainName": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "CloudFrontDistribution",
+                    "DomainName"
+                ]
+            }
+        },
+        "CloudFrontSecureURL": {
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "https://",
+                        {
+                            "Fn::GetAtt": [
+                                "CloudFrontDistribution",
+                                "DomainName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "CloudFrontOriginAccessIdentity": {
+            "Value": {
+                "Ref": "OriginAccessIdentity"
+            }
         }
     }
 }
