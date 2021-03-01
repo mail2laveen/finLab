@@ -17,9 +17,9 @@ import HostObject from './HostObject';
 
 import aws from './awspack';
 import anim from './animpack';
-import Amplify, { Auth } from 'aws-amplify';
-import awsconfig from '../aws-exports';
-Amplify.configure(awsconfig);
+// import Amplify, { Auth } from 'aws-amplify';
+// import awsconfig from '../aws-exports';
+// Amplify.configure(awsconfig);
 
 export default {
   /**
