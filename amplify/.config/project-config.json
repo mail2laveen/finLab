@@ -1,12 +1,12 @@
 {
-  "projectName": "testthree",
+  "projectName": "testsix",
   "version": "3.0",
   "frontend": "javascript",
   "javascript": {
     "framework": "none",
     "config": {
-      "SourceDir": "examples",
-      "DistributionDir": "examples",
+      "SourceDir": "dist",
+      "DistributionDir": "dist",
       "BuildCommand": "npm run-script build",
       "StartCommand": "npm run-script start"
     }
