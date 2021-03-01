@@ -1,8 +1,0 @@
-{
-    "hostingS3AndCloudFrontCloudFrontDomainName": { 
-    "Fn::GetAtt": [
-        "hostingS3AndCloudFront",
-        "Outputs.CloudFrontDomainName"
-    ]
-    }
-}

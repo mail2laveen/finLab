@@ -1,12 +1,12 @@
 {
-  "projectName": "finLab",
+  "projectName": "testthree",
   "version": "3.0",
   "frontend": "javascript",
   "javascript": {
     "framework": "none",
     "config": {
-      "SourceDir": "src",
-      "DistributionDir": "dist",
+      "SourceDir": "examples",
+      "DistributionDir": "examples",
       "BuildCommand": "npm run-script build",
       "StartCommand": "npm run-script start"
     }

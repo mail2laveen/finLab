@@ -1,20 +1,15 @@
 {
   "dev": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-finlab-dev-235011-authRole",
-      "UnauthRoleArn": "arn:aws:iam::215224172516:role/amplify-finlab-dev-235011-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::215224172516:role/amplify-finlab-dev-235011-authRole",
+      "AuthRoleName": "amplify-testthree-dev-225749-authRole",
+      "UnauthRoleArn": "arn:aws:iam::215224172516:role/amplify-testthree-dev-225749-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::215224172516:role/amplify-testthree-dev-225749-authRole",
       "Region": "us-west-2",
-      "DeploymentBucketName": "amplify-finlab-dev-235011-deployment",
-      "UnauthRoleName": "amplify-finlab-dev-235011-unauthRole",
-      "StackName": "amplify-finlab-dev-235011",
-      "StackId": "arn:aws:cloudformation:us-west-2:215224172516:stack/amplify-finlab-dev-235011/9cf7d920-79f1-11eb-a6aa-06bfb88e3d69",
-      "AmplifyAppId": "d32kugdkng7icb"
-    },
-    "categories": {
-      "auth": {
-        "finLab": {}
-      }
+      "DeploymentBucketName": "amplify-testthree-dev-225749-deployment",
+      "UnauthRoleName": "amplify-testthree-dev-225749-unauthRole",
+      "StackName": "amplify-testthree-dev-225749",
+      "StackId": "arn:aws:cloudformation:us-west-2:215224172516:stack/amplify-testthree-dev-225749/75be6a00-7ab3-11eb-a16f-0a0cccf9a5fd",
+      "AmplifyAppId": "diy3l13oo2sdv"
     }
   }
 }

@@ -1,23 +1,8 @@
 {
-  "edge": {
-      "LambdaEdgeProtection": {
-          "service": "LambdaAtEdge",
-          "providerPlugin": "awscloudformation",
-          "dependsOn": [
-              {
-                  "category": "hosting",
-                  "resourceName": "S3AndCloudFront",
-                  "attributes": [
-                      "CloudFrontDomainName"
-                  ]
-              }
-          ]
-      }
-  },
   "hosting": {
-      "S3AndCloudFront": {
-          "service": "S3AndCloudFront",
-          "providerPlugin": "awscloudformation"
-      }
+    "S3AndCloudFront": {
+      "service": "S3AndCloudFront",
+      "providerPlugin": "awscloudformation"
+    }
   }
 }
